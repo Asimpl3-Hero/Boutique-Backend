@@ -45,6 +45,24 @@ export class AppConfigService {
     return this.intOrDefault('DELIVERY_FEE_IN_CENTS', 0);
   }
 
+  public get corsOrigins(): string[] {
+    const value = this.configService.get<string>('CORS_ORIGINS');
+    const parsed = (value ?? '')
+      .split(',')
+      .map((origin) => origin.trim())
+      .filter((origin) => origin.length > 0);
+
+    return parsed.length > 0 ? parsed : ['http://localhost:5173'];
+  }
+
+  public get rateLimitWindowMs(): number {
+    return this.intOrDefault('RATE_LIMIT_WINDOW_MS', 60000);
+  }
+
+  public get rateLimitMaxRequests(): number {
+    return this.intOrDefault('RATE_LIMIT_MAX_REQUESTS', 120);
+  }
+
   private required(key: string): string {
     const value = this.configService.get<string>(key);
 

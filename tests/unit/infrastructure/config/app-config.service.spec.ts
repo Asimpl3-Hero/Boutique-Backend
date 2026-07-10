@@ -78,6 +78,24 @@ describe('AppConfigService', () => {
     });
   });
 
+  describe('hardening', () => {
+    it('parses a CSV of CORS origins', () => {
+      const config = build({ CORS_ORIGINS: 'https://a.com, https://b.com' });
+
+      expect(config.corsOrigins).toEqual(['https://a.com', 'https://b.com']);
+    });
+
+    it('falls back to the localhost origin when unset', () => {
+      expect(build({}).corsOrigins).toEqual(['http://localhost:5173']);
+    });
+
+    it('reads rate-limit settings with defaults', () => {
+      expect(build({}).rateLimitWindowMs).toBe(60000);
+      expect(build({}).rateLimitMaxRequests).toBe(120);
+      expect(build({ RATE_LIMIT_MAX_REQUESTS: '50' }).rateLimitMaxRequests).toBe(50);
+    });
+  });
+
   describe('dependency injection', () => {
     it('resolves from a Nest module with ConfigModule', async () => {
       const moduleRef = await Test.createTestingModule({
