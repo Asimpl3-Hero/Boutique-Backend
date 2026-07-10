@@ -78,6 +78,62 @@ describe('PrismaOrderRepositoryAdapter', () => {
     expect((result as Ok<Order[]>).value).toHaveLength(2);
   });
 
+  it('maps a linked transaction and full delivery relations', async () => {
+    const { adapter, order } = build();
+    order.findUnique.mockResolvedValue(
+      orderRow({
+        transaction: { providerTransactionId: 'prov_9' },
+        delivery: {
+          fullName: 'Ada',
+          email: 'buyer@example.com',
+          phone: '+573001112233',
+          address1: 'Calle 1',
+          address2: 'Apto 2',
+          city: 'Bogotá',
+          state: 'Cundinamarca',
+          zip: '110111',
+          country: 'CO',
+        },
+      }),
+    );
+
+    const value = (await adapter.findById('o1')) as Ok<Order | null>;
+    const order1 = value.value as Order;
+
+    expect(order1.providerTransactionId).toBe('prov_9');
+    expect(order1.shippingData).toMatchObject({
+      fullName: 'Ada',
+      address2: 'Apto 2',
+      country: 'CO',
+    });
+  });
+
+  it('updates the order status', async () => {
+    const { adapter, order } = build();
+    order.update.mockResolvedValue(orderRow({ status: 'DECLINED' }));
+
+    const result = await adapter.updateStatus('o1', 'DECLINED');
+
+    expect((result as Ok<Order>).value.status).toBe('DECLINED');
+  });
+
+  it('wraps createPending errors as PERSISTENCE_ERROR', async () => {
+    const { adapter, order } = build();
+    order.create.mockRejectedValue(new Error('db down'));
+
+    const result = await adapter.createPending({
+      productId: 'p1',
+      customerId: 'c1',
+      quantity: 1,
+      baseFeeInCents: 0,
+      deliveryFeeInCents: 0,
+      amountInCents: 1000,
+      currency: 'COP',
+    });
+
+    expect((result as Err<AppError>).error.code).toBe('PERSISTENCE_ERROR');
+  });
+
   describe('approveOrderAndDecrementStock', () => {
     it('decrements stock and approves the order atomically', async () => {
       const { adapter, tx } = build();

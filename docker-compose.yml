@@ -17,5 +17,47 @@ services:
       timeout: 5s
       retries: 10
 
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: boutique-api
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      NODE_ENV: ${NODE_ENV:-production}
+      PORT: ${PORT:-3000}
+      DATABASE_URL: 'postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@db:5432/${POSTGRES_DB:-boutique}?schema=public'
+      # Payment provider (sandbox) — interpolated from your local .env, never committed
+      PAYMENTS_BASE_URL: ${PAYMENTS_BASE_URL}
+      PAYMENTS_PUBLIC_KEY: ${PAYMENTS_PUBLIC_KEY}
+      PAYMENTS_PRIVATE_KEY: ${PAYMENTS_PRIVATE_KEY}
+      PAYMENTS_INTEGRITY_SECRET: ${PAYMENTS_INTEGRITY_SECRET}
+      PAYMENTS_ACCEPTANCE_TOKEN: ${PAYMENTS_ACCEPTANCE_TOKEN:-}
+      BASE_FEE_IN_CENTS: ${BASE_FEE_IN_CENTS:-0}
+      DELIVERY_FEE_IN_CENTS: ${DELIVERY_FEE_IN_CENTS:-0}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:5173}
+      RATE_LIMIT_WINDOW_MS: ${RATE_LIMIT_WINDOW_MS:-60000}
+      RATE_LIMIT_MAX_REQUESTS: ${RATE_LIMIT_MAX_REQUESTS:-120}
+      SWAGGER_ENABLED: ${SWAGGER_ENABLED:-true}
+      SWAGGER_PATH: ${SWAGGER_PATH:-docs}
+    ports:
+      - '${API_HOST_PORT:-3000}:${PORT:-3000}'
+
+  seed:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      NODE_ENV: ${NODE_ENV:-production}
+      DATABASE_URL: 'postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@db:5432/${POSTGRES_DB:-boutique}?schema=public'
+    entrypoint: ['/bin/sh', '-c', 'pnpm prisma db seed']
+    profiles: ['seed']
+
 volumes:
   boutique_pgdata:
