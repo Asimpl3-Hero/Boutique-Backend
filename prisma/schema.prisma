@@ -1,0 +1,90 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Product {
+  id           String   @id @default(uuid()) @db.Uuid
+  name         String
+  description  String
+  priceInCents Int      @map("price_in_cents")
+  imageUrl     String   @default("") @map("image_url")
+  stock        Int      @default(0)
+  currency     String
+  createdAt    DateTime @default(now()) @map("created_at")
+  orders       Order[]
+
+  @@map("products")
+}
+
+model Customer {
+  id        String   @id @default(uuid()) @db.Uuid
+  email     String   @unique
+  fullName  String   @map("full_name")
+  phone     String?
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  orders    Order[]
+
+  @@map("customers")
+}
+
+model Order {
+  id                 String       @id @default(uuid()) @db.Uuid
+  productId          String       @map("product_id") @db.Uuid
+  customerId         String       @map("customer_id") @db.Uuid
+  quantity           Int          @default(1)
+  baseFeeInCents     Int          @map("base_fee_in_cents")
+  deliveryFeeInCents Int          @map("delivery_fee_in_cents")
+  amountInCents      Int          @map("amount_in_cents")
+  currency           String
+  status             OrderStatus  @default(PENDING)
+  createdAt          DateTime     @default(now()) @map("created_at")
+  product            Product      @relation(fields: [productId], references: [id], onDelete: Restrict)
+  customer           Customer     @relation(fields: [customerId], references: [id], onDelete: Restrict)
+  transaction        Transaction?
+  delivery           Delivery?
+
+  @@index([productId])
+  @@index([customerId])
+  @@map("orders")
+}
+
+model Transaction {
+  id                    String      @id @default(uuid()) @db.Uuid
+  orderId               String      @unique @map("order_id") @db.Uuid
+  providerTransactionId String?     @map("provider_transaction_id")
+  status                OrderStatus @default(PENDING)
+  createdAt             DateTime    @default(now()) @map("created_at")
+  order                 Order       @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([providerTransactionId])
+  @@map("transactions")
+}
+
+model Delivery {
+  id        String   @id @default(uuid()) @db.Uuid
+  orderId   String   @unique @map("order_id") @db.Uuid
+  fullName  String   @map("full_name")
+  email     String
+  phone     String?
+  address1  String
+  address2  String?
+  city      String
+  state     String
+  zip       String
+  country   String?
+  createdAt DateTime @default(now()) @map("created_at")
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@map("deliveries")
+}
+
+enum OrderStatus {
+  PENDING
+  APPROVED
+  DECLINED
+}
