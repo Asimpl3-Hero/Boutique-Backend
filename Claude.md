@@ -85,7 +85,9 @@ tests/
 - **Entidades = interfaces planas** (sin lógica ni decoradores); la validación/invariantes van en **value-objects** (`static create()` → `Result`).
 - **Adaptadores de persistencia mapean Prisma ⇄ dominio** (la fila de Prisma no es la entidad de dominio) y envuelven errores de BD en `AppError` (`PERSISTENCE_ERROR`).
 - **Swagger**: los schemas viven en `infrastructure/adapters/inbound/http/docs/` y se referencian desde los controllers.
-- **Nombre de bloque backend**: `## Bloque N — Backend/<Capa>: <acción>` con `<Capa>` ∈ {Domain, Application, Inbound-HTTP, Outbound-Persistence, Outbound-Integration, Config, Shared, Prisma, Module}.
+- **Nombre de bloque backend**: `## Bloque N — Backend/<Capa>: <acción>` con `<Capa>` ∈ {Domain, Application, Inbound-HTTP, Outbound-Persistence, Outbound-Integration, Config, Shared, Prisma, Module, **Testing**, **Delivery**}.
+  - **`Testing`** y **`Delivery`** son capas **transversales** (no mapean a una carpeta hexagonal): `Testing` = tests de integración/e2e y gate de cobertura; `Delivery` = empaquetado (Dockerfile, entrypoint) y docs (README). Los **unit tests por capa** se escriben dentro del bloque de su feature (cada bloque cierra con `pnpm test`), no en un bloque `Testing` aparte.
+  - **Capas combinadas permitidas** cuando un único commit *shippable* toca dos capas de forma natural: se escriben con `+` (ej. `Backend/Inbound-HTTP + Module`: exponer el controller y cablear su puerto en `app.module.ts` van en el mismo commit, porque un controller sin su provider rompe el arranque). No abusar: solo cuando separarlas dejaría un commit que no arranca/valida.
 
 ## Tests
 
