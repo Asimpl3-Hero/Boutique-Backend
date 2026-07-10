@@ -63,6 +63,15 @@ export class AppConfigService {
     return this.intOrDefault('RATE_LIMIT_MAX_REQUESTS', 120);
   }
 
+  public get swaggerEnabled(): boolean {
+    const value = this.configService.get<string>('SWAGGER_ENABLED');
+    return value ? value.trim().toLowerCase() === 'true' : true;
+  }
+
+  public get swaggerPath(): string {
+    return this.configService.get<string>('SWAGGER_PATH')?.trim() || 'docs';
+  }
+
   private required(key: string): string {
     const value = this.configService.get<string>(key);
 
