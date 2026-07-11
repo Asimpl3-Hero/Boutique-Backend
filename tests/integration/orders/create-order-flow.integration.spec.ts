@@ -1,6 +1,7 @@
 import { CreateOrderUseCase } from '../../../src/application/use-cases/create-order.use-case';
 import { GetOrderByIdUseCase } from '../../../src/application/use-cases/get-order-by-id.use-case';
 import { CreateOrderPaymentMethodResolver } from '../../../src/application/services/create-order-payment-method.resolver';
+import { TaxService } from '../../../src/domain/services';
 import type { AppConfigService } from '../../../src/infrastructure/config/app-config.service';
 import { Ok, Err } from '../../../src/shared/railway';
 import { AppError } from '../../../src/shared/errors';
@@ -21,6 +22,7 @@ import {
 const appConfig = {
   baseFeeInCents: 500000,
   deliveryFeeInCents: 500000,
+  taxRatePercent: 18,
 } as unknown as AppConfigService;
 
 const buildFlow = (products = [makeProduct({ stock: 5 })]) => {
@@ -41,6 +43,7 @@ const buildFlow = (products = [makeProduct({ stock: 5 })]) => {
     paymentGateway,
     pollingService,
     new CreateOrderPaymentMethodResolver(),
+    new TaxService(),
     appConfig,
   );
   const getOrderByIdUseCase = new GetOrderByIdUseCase(orderRepository);

@@ -19,6 +19,10 @@ export interface Order {
   quantity: number;
   baseFeeInCents: number;
   deliveryFeeInCents: number;
+  /** VAT rate applied at creation time (integer percent, frozen per order). */
+  taxRatePercent: number;
+  /** VAT portion included in amountInCents (never added on top). */
+  taxInCents: number;
   amountInCents: number;
   currency: string;
   status: OrderStatus;

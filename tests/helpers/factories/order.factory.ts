@@ -21,6 +21,8 @@ export const makeOrder = (overrides: Partial<Order> = {}): Order => ({
   quantity: 1,
   baseFeeInCents: 0,
   deliveryFeeInCents: 0,
+  taxRatePercent: 18,
+  taxInCents: 19815,
   amountInCents: 129900,
   currency: 'COP',
   status: 'PENDING',

@@ -11,6 +11,8 @@ const orderRow = (overrides: Record<string, unknown> = {}) => ({
   quantity: 2,
   baseFeeInCents: 0,
   deliveryFeeInCents: 0,
+  taxRatePercent: 18,
+  taxInCents: 3051,
   amountInCents: 20000,
   currency: 'COP',
   status: 'PENDING',
@@ -51,6 +53,8 @@ describe('PrismaOrderRepositoryAdapter', () => {
       quantity: 2,
       baseFeeInCents: 0,
       deliveryFeeInCents: 0,
+      taxRatePercent: 18,
+      taxInCents: 3051,
       amountInCents: 20000,
       currency: 'COP',
     });
@@ -58,6 +62,8 @@ describe('PrismaOrderRepositoryAdapter', () => {
     const value = (result as Ok<Order>).value;
     expect(value.status).toBe('PENDING');
     expect(value.customerEmail).toBe('buyer@example.com');
+    expect(value.taxRatePercent).toBe(18);
+    expect(value.taxInCents).toBe(3051);
   });
 
   it('findById returns null when absent', async () => {
@@ -127,6 +133,8 @@ describe('PrismaOrderRepositoryAdapter', () => {
       quantity: 1,
       baseFeeInCents: 0,
       deliveryFeeInCents: 0,
+      taxRatePercent: 18,
+      taxInCents: 153,
       amountInCents: 1000,
       currency: 'COP',
     });

@@ -2,6 +2,7 @@ import { HttpException } from '@nestjs/common';
 import { ProductsController } from '../../../../../src/infrastructure/adapters/inbound/http/products.controller';
 import { GetProductsUseCase } from '../../../../../src/application/use-cases/get-products.use-case';
 import { GetProductByIdUseCase } from '../../../../../src/application/use-cases/get-product-by-id.use-case';
+import { AppConfigService } from '../../../../../src/infrastructure/config/app-config.service';
 import { ok, err } from '../../../../../src/shared/railway';
 import { makeProduct } from '../../../../helpers/factories/product.factory';
 
@@ -9,9 +10,11 @@ describe('ProductsController', () => {
   const buildController = () => {
     const getProducts = { execute: jest.fn() };
     const getProductById = { execute: jest.fn() };
+    const appConfig = { taxRatePercent: 18 } as unknown as AppConfigService;
     const controller = new ProductsController(
       getProducts as unknown as GetProductsUseCase,
       getProductById as unknown as GetProductByIdUseCase,
+      appConfig,
     );
 
     return { controller, getProducts, getProductById };
@@ -34,6 +37,7 @@ describe('ProductsController', () => {
           imageUrl: product.imageUrl,
           stock: product.stock,
           currency: product.currency,
+          taxRatePercent: 18,
           createdAt: product.createdAt,
         },
       ]);
@@ -60,6 +64,7 @@ describe('ProductsController', () => {
       const response = await controller.getProductById(product.id);
 
       expect(response.id).toBe(product.id);
+      expect(response.taxRatePercent).toBe(18);
       expect(getProductById.execute).toHaveBeenCalledWith(product.id);
     });
 

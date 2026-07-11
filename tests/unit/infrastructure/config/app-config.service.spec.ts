@@ -76,6 +76,11 @@ describe('AppConfigService', () => {
       expect(build({}).baseFeeInCents).toBe(0);
       expect(build({ DELIVERY_FEE_IN_CENTS: 'x' }).deliveryFeeInCents).toBe(0);
     });
+
+    it('parses the VAT rate and defaults it to 0', () => {
+      expect(build({ TAX_RATE_PERCENT: '18' }).taxRatePercent).toBe(18);
+      expect(build({}).taxRatePercent).toBe(0);
+    });
   });
 
   describe('hardening', () => {

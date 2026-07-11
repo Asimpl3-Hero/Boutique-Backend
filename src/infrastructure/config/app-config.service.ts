@@ -45,6 +45,11 @@ export class AppConfigService {
     return this.intOrDefault('DELIVERY_FEE_IN_CENTS', 0);
   }
 
+  /** VAT rate included in product prices (integer percent, e.g. 18). */
+  public get taxRatePercent(): number {
+    return this.intOrDefault('TAX_RATE_PERCENT', 0);
+  }
+
   public get corsOrigins(): string[] {
     const value = this.configService.get<string>('CORS_ORIGINS');
     const parsed = (value ?? '')

@@ -6,6 +6,8 @@ export interface OrderResponseDto {
   quantity: number;
   baseFeeInCents: number;
   deliveryFeeInCents: number;
+  taxRatePercent: number;
+  taxInCents: number;
   amountInCents: number;
   currency: string;
   status: OrderStatus;
@@ -21,6 +23,8 @@ export const toOrderResponse = (order: Order): OrderResponseDto => ({
   quantity: order.quantity,
   baseFeeInCents: order.baseFeeInCents,
   deliveryFeeInCents: order.deliveryFeeInCents,
+  taxRatePercent: order.taxRatePercent,
+  taxInCents: order.taxInCents,
   amountInCents: order.amountInCents,
   currency: order.currency,
   status: order.status,

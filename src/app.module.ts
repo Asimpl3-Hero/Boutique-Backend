@@ -13,7 +13,7 @@ import { IntegritySignatureService } from './infrastructure/adapters/outbound/pa
 import { PaymentMethodMapper } from './infrastructure/adapters/outbound/payments/payment-method.mapper';
 import { PaymentGatewayAdapter } from './infrastructure/adapters/outbound/payments/payment-gateway.adapter';
 import { OrderStatusPollingService } from './infrastructure/adapters/outbound/payments/order-status-polling.service';
-import { OrderStatusService } from './domain/services';
+import { OrderStatusService, TaxService } from './domain/services';
 import {
   PRODUCT_REPOSITORY_PORT,
   CUSTOMER_REPOSITORY_PORT,
@@ -48,6 +48,7 @@ import { HealthController } from './infrastructure/adapters/inbound/http/health.
     IntegritySignatureService,
     PaymentMethodMapper,
     { provide: OrderStatusService, useValue: new OrderStatusService() },
+    { provide: TaxService, useValue: new TaxService() },
     // Application
     CreateOrderPaymentMethodResolver,
     GetProductsUseCase,

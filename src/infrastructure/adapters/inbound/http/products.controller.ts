@@ -13,6 +13,7 @@ import {
   ProductResponseDto,
   toProductResponse,
 } from '../../../../application/dto/product-response.dto';
+import { AppConfigService } from '../../../config/app-config.service';
 import { toHttpException } from './http-error.mapper';
 import {
   APP_ERROR_SCHEMA,
@@ -26,6 +27,7 @@ export class ProductsController {
   constructor(
     private readonly getProductsUseCase: GetProductsUseCase,
     private readonly getProductByIdUseCase: GetProductByIdUseCase,
+    private readonly appConfig: AppConfigService,
   ) {}
 
   @Get()
@@ -45,7 +47,10 @@ export class ProductsController {
     const result = await this.getProductsUseCase.execute();
 
     return result.match(
-      (products) => products.map(toProductResponse),
+      (products) =>
+        products.map((product) =>
+          toProductResponse(product, this.appConfig.taxRatePercent),
+        ),
       (error) => {
         throw toHttpException(error);
       },
@@ -73,7 +78,8 @@ export class ProductsController {
     const result = await this.getProductByIdUseCase.execute(id);
 
     return result.match(
-      (product) => toProductResponse(product),
+      (product) =>
+        toProductResponse(product, this.appConfig.taxRatePercent),
       (error) => {
         throw toHttpException(error);
       },

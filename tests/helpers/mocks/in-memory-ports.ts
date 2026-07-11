@@ -85,6 +85,8 @@ export class InMemoryOrderRepository implements OrderRepositoryPort {
       quantity: input.quantity,
       baseFeeInCents: input.baseFeeInCents,
       deliveryFeeInCents: input.deliveryFeeInCents,
+      taxRatePercent: input.taxRatePercent,
+      taxInCents: input.taxInCents,
       amountInCents: input.amountInCents,
       currency: input.currency,
       status: 'PENDING',

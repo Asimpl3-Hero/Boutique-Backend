@@ -10,6 +10,8 @@ export interface CreatePendingOrderInput {
   quantity: number;
   baseFeeInCents: number;
   deliveryFeeInCents: number;
+  taxRatePercent: number;
+  taxInCents: number;
   amountInCents: number;
   currency: string;
 }

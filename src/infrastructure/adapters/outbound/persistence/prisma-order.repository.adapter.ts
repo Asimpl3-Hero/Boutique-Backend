@@ -15,6 +15,8 @@ interface OrderRow {
   quantity: number;
   baseFeeInCents: number;
   deliveryFeeInCents: number;
+  taxRatePercent: number;
+  taxInCents: number;
   amountInCents: number;
   currency: string;
   status: string;
@@ -55,6 +57,8 @@ export class PrismaOrderRepositoryAdapter implements OrderRepositoryPort {
           quantity: input.quantity,
           baseFeeInCents: input.baseFeeInCents,
           deliveryFeeInCents: input.deliveryFeeInCents,
+          taxRatePercent: input.taxRatePercent,
+          taxInCents: input.taxInCents,
           amountInCents: input.amountInCents,
           currency: input.currency,
           status: 'PENDING',
@@ -216,6 +220,8 @@ export class PrismaOrderRepositoryAdapter implements OrderRepositoryPort {
       quantity: order.quantity > 0 ? order.quantity : 1,
       baseFeeInCents: order.baseFeeInCents,
       deliveryFeeInCents: order.deliveryFeeInCents,
+      taxRatePercent: order.taxRatePercent,
+      taxInCents: order.taxInCents,
       amountInCents: order.amountInCents,
       currency: order.currency,
       status: order.status as OrderStatus,

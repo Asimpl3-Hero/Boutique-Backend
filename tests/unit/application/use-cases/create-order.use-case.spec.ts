@@ -3,6 +3,7 @@ import {
   CreateOrderInput,
 } from '../../../../src/application/use-cases/create-order.use-case';
 import { CreateOrderPaymentMethodResolver } from '../../../../src/application/services/create-order-payment-method.resolver';
+import { TaxService } from '../../../../src/domain/services';
 import { AppConfigService } from '../../../../src/infrastructure/config/app-config.service';
 import { Ok, Err, ok, err } from '../../../../src/shared/railway';
 import { AppError } from '../../../../src/shared/errors';
@@ -31,6 +32,7 @@ const buildUseCase = () => {
   const appConfig = {
     baseFeeInCents: 0,
     deliveryFeeInCents: 0,
+    taxRatePercent: 18,
   } as unknown as AppConfigService;
 
   const useCase = new CreateOrderUseCase(
@@ -42,6 +44,7 @@ const buildUseCase = () => {
     paymentGateway,
     pollingService,
     new CreateOrderPaymentMethodResolver(),
+    new TaxService(),
     appConfig,
   );
 
@@ -106,6 +109,22 @@ describe('CreateOrderUseCase', () => {
       'prov_tx_1',
     );
     expect(mocks.pollingService.start).toHaveBeenCalledWith(order.id, 'prov_tx_1');
+  });
+
+  it('persists the VAT breakdown included in the total (rate frozen per order)', async () => {
+    const mocks = buildUseCase();
+    primeHappyPath(mocks);
+
+    await mocks.useCase.execute(validInput());
+
+    // 129900 → taxable 110085 + tax 19815 at 18%; the total is untouched.
+    expect(mocks.orderRepository.createPending).toHaveBeenCalledWith(
+      expect.objectContaining({
+        taxRatePercent: 18,
+        taxInCents: 19815,
+        amountInCents: 129900,
+      }),
+    );
   });
 
   it('rejects a non-positive quantity before touching the repositories', async () => {

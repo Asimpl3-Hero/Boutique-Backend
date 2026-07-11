@@ -46,6 +46,7 @@ export const PRODUCT_RESPONSE_SCHEMA = {
     'imageUrl',
     'stock',
     'currency',
+    'taxRatePercent',
     'createdAt',
   ],
   properties: {
@@ -56,6 +57,11 @@ export const PRODUCT_RESPONSE_SCHEMA = {
     imageUrl: { type: 'string', example: 'https://picsum.photos/seed/linen-shirt/600/800' },
     stock: { type: 'integer', example: 15 },
     currency: { type: 'string', example: 'COP' },
+    taxRatePercent: {
+      type: 'integer',
+      example: 18,
+      description: 'VAT rate already included in priceInCents.',
+    },
     createdAt: { type: 'string', format: 'date-time' },
   },
 };
@@ -120,6 +126,8 @@ export const ORDER_RESPONSE_SCHEMA = {
     'quantity',
     'baseFeeInCents',
     'deliveryFeeInCents',
+    'taxRatePercent',
+    'taxInCents',
     'amountInCents',
     'currency',
     'status',
@@ -134,6 +142,16 @@ export const ORDER_RESPONSE_SCHEMA = {
     quantity: { type: 'integer', example: 1 },
     baseFeeInCents: { type: 'integer', example: 0 },
     deliveryFeeInCents: { type: 'integer', example: 0 },
+    taxRatePercent: {
+      type: 'integer',
+      example: 18,
+      description: 'VAT rate frozen at order creation.',
+    },
+    taxInCents: {
+      type: 'integer',
+      example: 1981525,
+      description: 'VAT portion included in amountInCents.',
+    },
     amountInCents: { type: 'integer', example: 12990000 },
     currency: { type: 'string', example: 'COP' },
     status: { type: 'string', enum: [...ORDER_STATUS_ENUM], example: 'PENDING' },

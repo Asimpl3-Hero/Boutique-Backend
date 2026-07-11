@@ -26,6 +26,7 @@ import type {
   ShippingData,
 } from '../../domain/entities';
 import { Money } from '../../domain/value-objects';
+import { TaxService } from '../../domain/services';
 import { AppConfigService } from '../../infrastructure/config/app-config.service';
 import { AppError } from '../../shared/errors';
 import { Result, err } from '../../shared/railway';
@@ -56,6 +57,8 @@ interface CreateOrderContextWithMoney extends CreateOrderContextWithProduct {
   money: Money;
   baseFeeInCents: number;
   deliveryFeeInCents: number;
+  taxRatePercent: number;
+  taxInCents: number;
 }
 
 interface CreateOrderContextWithPaymentMethod
@@ -94,6 +97,7 @@ export class CreateOrderUseCase {
     @Inject(ORDER_STATUS_POLLING_PORT)
     private readonly pollingService: OrderStatusPollingPort,
     private readonly paymentMethodResolver: CreateOrderPaymentMethodResolver,
+    private readonly taxService: TaxService,
     private readonly appConfig: AppConfigService,
   ) {}
 
@@ -201,12 +205,20 @@ export class CreateOrderUseCase {
     const deliveryFeeInCents = this.appConfig.deliveryFeeInCents;
     const totalInCents = subtotal + baseFeeInCents + deliveryFeeInCents;
 
-    return Money.create(totalInCents, ctx.product.currency).map((money) => ({
-      ...ctx,
-      money,
-      baseFeeInCents,
-      deliveryFeeInCents,
-    }));
+    // VAT is included in prices: break it out of the total (never on top),
+    // freezing the applied rate on the order.
+    return Money.create(totalInCents, ctx.product.currency).flatMap((money) =>
+      this.taxService
+        .breakdownIncludedTax(money.amountInCents, this.appConfig.taxRatePercent)
+        .map((tax) => ({
+          ...ctx,
+          money,
+          baseFeeInCents,
+          deliveryFeeInCents,
+          taxRatePercent: tax.ratePercent,
+          taxInCents: tax.taxInCents,
+        })),
+    );
   }
 
   private resolvePaymentMethod(
@@ -238,6 +250,8 @@ export class CreateOrderUseCase {
       quantity: ctx.quantity,
       baseFeeInCents: ctx.baseFeeInCents,
       deliveryFeeInCents: ctx.deliveryFeeInCents,
+      taxRatePercent: ctx.taxRatePercent,
+      taxInCents: ctx.taxInCents,
       amountInCents: ctx.money.amountInCents,
       currency: ctx.money.currency,
     });
