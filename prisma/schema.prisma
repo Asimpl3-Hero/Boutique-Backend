@@ -39,6 +39,8 @@ model Order {
   quantity           Int          @default(1)
   baseFeeInCents     Int          @map("base_fee_in_cents")
   deliveryFeeInCents Int          @map("delivery_fee_in_cents")
+  taxRatePercent     Int          @default(0) @map("tax_rate_percent")
+  taxInCents         Int          @default(0) @map("tax_in_cents")
   amountInCents      Int          @map("amount_in_cents")
   currency           String
   status             OrderStatus  @default(PENDING)
