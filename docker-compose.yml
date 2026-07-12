@@ -35,6 +35,9 @@ services:
       PORT: ${PORT:-3000}
       # Seed the catalog on boot if empty (idempotent; never wipes data).
       SEED_ON_START: ${SEED_ON_START:-false}
+      # Base URL the seed writes into product imageUrl (must be the public
+      # host in production, e.g. https://borcelle-api.ondeploy.store).
+      ASSETS_BASE_URL: ${ASSETS_BASE_URL:-http://localhost:3000}
       DATABASE_URL: 'postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@db:5432/${POSTGRES_DB:-boutique}?schema=public'
       # Payment provider (sandbox) — interpolated from your local .env, never committed
       PAYMENTS_BASE_URL: ${PAYMENTS_BASE_URL}
@@ -65,6 +68,7 @@ services:
         condition: service_healthy
     environment:
       NODE_ENV: ${NODE_ENV:-production}
+      ASSETS_BASE_URL: ${ASSETS_BASE_URL:-http://localhost:3000}
       DATABASE_URL: 'postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@db:5432/${POSTGRES_DB:-boutique}?schema=public'
     entrypoint: ['/bin/sh', '-c', 'pnpm prisma db seed']
     profiles: ['seed']
