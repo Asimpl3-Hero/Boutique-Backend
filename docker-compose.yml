@@ -7,8 +7,12 @@ services:
       POSTGRES_DB: ${POSTGRES_DB:-boutique}
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+    # Bind to localhost by default: the API reaches the DB over the internal
+    # compose network, so the host port must NOT be exposed to the internet.
+    # Local dev keeps 127.0.0.1:5432 (DBeaver); on the VPS reach it via SSH
+    # tunnel only. Never set DB_HOST_BIND to 0.0.0.0 in production.
     ports:
-      - '${DB_HOST_PORT:-5432}:5432'
+      - '${DB_HOST_BIND:-127.0.0.1}:${DB_HOST_PORT:-5432}:5432'
     volumes:
       - boutique_pgdata:/var/lib/postgresql/data
     healthcheck:
