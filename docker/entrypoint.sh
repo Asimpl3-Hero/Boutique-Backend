@@ -24,5 +24,11 @@ while [ "$attempt" -le "$MAX_RETRIES" ]; do
   sleep "$RETRY_DELAY_SECONDS"
 done
 
+# Opt-in: seed the catalog once if it is empty (safe on every redeploy).
+if [ "${SEED_ON_START:-false}" = "true" ]; then
+  echo "[entrypoint] SEED_ON_START=true — seeding catalog if empty..."
+  SEED_IF_EMPTY=true pnpm db:seed || echo "[entrypoint] Seed skipped/failed (non-fatal)."
+fi
+
 echo "[entrypoint] Starting API..."
 exec "$@"

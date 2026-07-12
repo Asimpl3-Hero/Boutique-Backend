@@ -28,6 +28,8 @@ COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/prisma.config.ts ./prisma.config.ts
 COPY --from=builder /app/package.json ./package.json
+# ts-node needs the tsconfig to run the seed script on boot (SEED_ON_START).
+COPY --from=builder /app/tsconfig.json ./tsconfig.json
 COPY docker/entrypoint.sh ./docker/entrypoint.sh
 RUN chmod +x ./docker/entrypoint.sh
 

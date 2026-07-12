@@ -29,6 +29,8 @@ services:
     environment:
       NODE_ENV: ${NODE_ENV:-production}
       PORT: ${PORT:-3000}
+      # Seed the catalog on boot if empty (idempotent; never wipes data).
+      SEED_ON_START: ${SEED_ON_START:-false}
       DATABASE_URL: 'postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@db:5432/${POSTGRES_DB:-boutique}?schema=public'
       # Payment provider (sandbox) — interpolated from your local .env, never committed
       PAYMENTS_BASE_URL: ${PAYMENTS_BASE_URL}

@@ -105,12 +105,26 @@ const products = [
 ];
 
 async function main(): Promise<void> {
+  // SEED_IF_EMPTY: safe to run on every boot — seeds only when the catalog
+  // is empty and never deletes existing data (no wiping orders on redeploy).
+  if (process.env.SEED_IF_EMPTY === 'true') {
+    const existing = await prisma.product.count();
+    if (existing > 0) {
+      console.log(`Catalog already has ${existing} products; skipping seed.`);
+      return;
+    }
+    await prisma.product.createMany({ data: products });
+    console.log(`Seeded ${products.length} products (empty catalog).`);
+    return;
+  }
+
+  // Default (manual `pnpm db:seed`): destructive reset for local/demo.
   // Orders reference products with Restrict: clear them first (their
-  // transactions and deliveries cascade). Demo reset, not a prod script.
+  // transactions and deliveries cascade).
   await prisma.order.deleteMany();
   await prisma.product.deleteMany();
   await prisma.product.createMany({ data: products });
-  console.log(`Seeded ${products.length} products.`);
+  console.log(`Seeded ${products.length} products (reset).`);
 }
 
 main()
