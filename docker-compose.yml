@@ -14,7 +14,7 @@ services:
     ports:
       - '${DB_HOST_BIND:-127.0.0.1}:${DB_HOST_PORT:-5432}:5432'
     volumes:
-      - boutique_pgdata:/var/lib/postgresql/data
+      - boutique_db_data:/var/lib/postgresql/data
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB']
       interval: 5s
@@ -70,4 +70,6 @@ services:
     profiles: ['seed']
 
 volumes:
-  boutique_pgdata:
+  # Renamed to force a clean re-init after changing DB credentials
+  # (POSTGRES_USER/PASSWORD only apply on a fresh volume).
+  boutique_db_data:
