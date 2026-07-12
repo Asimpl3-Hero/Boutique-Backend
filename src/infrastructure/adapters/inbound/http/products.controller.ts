@@ -16,12 +16,12 @@ import {
 import { AppConfigService } from '../../../config/app-config.service';
 import { toHttpException } from './http-error.mapper';
 import {
-  APP_ERROR_SCHEMA,
+  appErrorSchema,
   PRODUCTS_RESPONSE_SCHEMA,
   PRODUCT_RESPONSE_SCHEMA,
 } from './docs/swagger.schemas';
 
-@ApiTags('Products')
+@ApiTags('Productos')
 @Controller('products')
 export class ProductsController {
   constructor(
@@ -32,16 +32,17 @@ export class ProductsController {
 
   @Get()
   @ApiOperation({
-    summary: 'List products',
-    description: 'Returns the full catalog with price, stock and currency.',
+    summary: 'Listar productos',
+    description:
+      'Devuelve el catálogo completo: <span style="color:#4F6BD8;font-weight:bold">precio base</span> en centavos (sin IVA), <span style="color:#4F6BD8;font-weight:bold">stock</span> disponible, moneda y la <span style="color:#4F6BD8;font-weight:bold">tasa de IVA</span> que se aplicará al pagar.',
   })
   @ApiOkResponse({
-    description: 'Catalog returned.',
+    description: 'Catálogo devuelto.',
     schema: PRODUCTS_RESPONSE_SCHEMA,
   })
   @ApiInternalServerErrorResponse({
-    description: 'Persistence error.',
-    schema: APP_ERROR_SCHEMA,
+    description: 'Error de persistencia (<span style="color:#E5484D;font-weight:bold">PERSISTENCE_ERROR</span>).',
+    schema: appErrorSchema('PERSISTENCE_ERROR', 'Failed to fetch products.'),
   })
   public async getProducts(): Promise<ProductResponseDto[]> {
     const result = await this.getProductsUseCase.execute();
@@ -59,18 +60,22 @@ export class ProductsController {
 
   @Get(':id')
   @ApiOperation({
-    summary: 'Get a product by id',
-    description: 'Returns a single product by its identifier.',
+    summary: 'Obtener un producto por id',
+    description:
+      'Devuelve un producto puntual por su <span style="color:#4F6BD8;font-weight:bold">UUID</span>, con los mismos campos del listado.',
   })
-  @ApiParam({ name: 'id', description: 'Product UUID', format: 'uuid' })
-  @ApiOkResponse({ description: 'Product found.', schema: PRODUCT_RESPONSE_SCHEMA })
+  @ApiParam({ name: 'id', description: 'UUID del producto', format: 'uuid' })
+  @ApiOkResponse({ description: 'Producto encontrado.', schema: PRODUCT_RESPONSE_SCHEMA })
   @ApiNotFoundResponse({
-    description: 'Product not found (PRODUCT_NOT_FOUND).',
-    schema: APP_ERROR_SCHEMA,
+    description: 'Producto no encontrado (<span style="color:#E5484D;font-weight:bold">PRODUCT_NOT_FOUND</span>).',
+    schema: appErrorSchema(
+      'PRODUCT_NOT_FOUND',
+      'Product cedb6f47-d731-4ff9-8aa7-347948e123d8 was not found.',
+    ),
   })
   @ApiInternalServerErrorResponse({
-    description: 'Persistence error.',
-    schema: APP_ERROR_SCHEMA,
+    description: 'Error de persistencia (<span style="color:#E5484D;font-weight:bold">PERSISTENCE_ERROR</span>).',
+    schema: appErrorSchema('PERSISTENCE_ERROR', 'Failed to fetch product by id.'),
   })
   public async getProductById(
     @Param('id') id: string,

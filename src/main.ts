@@ -72,12 +72,32 @@ function setupSwagger(
   const documentConfig = new DocumentBuilder()
     .setTitle('Boutique API')
     .setDescription(
-      'Backend for the Boutique clothing checkout: products catalog, order creation and payment status. Hexagonal architecture, railway error handling, sandbox payment provider integration resolved by polling.',
+      [
+        'Backend del checkout de ropa <span style="color:#4F6BD8;font-weight:bold">BORCELLE</span>: catálogo de productos, creación de órdenes con pago con tarjeta y consulta de su estado.',
+        '',
+        '### Cómo funciona',
+        '',
+        '<span style="color:#4F6BD8;font-weight:bold">Flujo de pago</span> — la orden nace <span style="color:#F6C445;font-weight:bold">PENDING</span>, se cobra al proveedor (sandbox) y el estado final — <span style="color:#2E9E6B;font-weight:bold">APPROVED</span> o <span style="color:#E5484D;font-weight:bold">DECLINED</span> — se resuelve por <span style="color:#4F6BD8;font-weight:bold">polling</span> del backend al proveedor.',
+        '',
+        '<span style="color:#4F6BD8;font-weight:bold">IVA</span> — los precios del catálogo son la <span style="font-weight:bold">base imponible</span>; el backend suma el IVA configurado (<code>TAX_RATE_PERCENT</code>) y congela el desglose en cada orden.',
+        '',
+        '<span style="color:#4F6BD8;font-weight:bold">Stock</span> — al aprobarse el pago, la cantidad comprada se descuenta de forma <span style="font-weight:bold">atómica</span> (guarda anti-sobreventa).',
+        '',
+        '<span style="color:#4F6BD8;font-weight:bold">Seguridad</span> — nunca se recibe ni persiste el número de tarjeta; solo el <span style="font-weight:bold">token</span> generado por el proveedor.',
+        '',
+        '<span style="color:#4F6BD8;font-weight:bold">Arquitectura</span> — hexagonal (ports & adapters), errores por Railway (<code>Result</code>), Prisma + PostgreSQL.',
+      ].join('\n'),
     )
     .setVersion(API_VERSION)
-    .addTag('Products', 'Clothing catalog browsing.')
-    .addTag('Orders', 'Checkout: create an order and read its payment status.')
-    .addTag('Health', 'Service liveness probe.')
+    .addTag(
+      'Productos',
+      'Catálogo de ropa: precios base en centavos, stock disponible y la tasa de <span style="color:#4F6BD8;font-weight:bold">IVA</span> vigente.',
+    )
+    .addTag(
+      'Órdenes',
+      'Checkout: crear una orden (una por producto) y consultar su estado de pago resuelto por <span style="color:#4F6BD8;font-weight:bold">polling</span>.',
+    )
+    .addTag('Salud', 'Sonda de vida del servicio.')
     .addServer('/')
     .build();
 
@@ -91,6 +111,9 @@ function setupSwagger(
       persistAuthorization: true,
       tagsSorter: 'alpha',
       operationsSorter: 'method',
+      // Keeps the inline <span> highlights in descriptions (the docs-only
+      // CSP already restricts what can render here).
+      useUnsafeMarkdown: true,
     },
   });
 }
