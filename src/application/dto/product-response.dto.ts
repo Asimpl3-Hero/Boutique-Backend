@@ -8,7 +8,7 @@ export interface ProductResponseDto {
   imageUrl: string;
   stock: number;
   currency: string;
-  /** VAT rate already included in priceInCents (integer percent). */
+  /** VAT rate applied on top of priceInCents (integer percent). */
   taxRatePercent: number;
   createdAt: Date;
 }

@@ -203,14 +203,14 @@ export class CreateOrderUseCase {
     const subtotal = ctx.product.priceInCents * ctx.quantity;
     const baseFeeInCents = this.appConfig.baseFeeInCents;
     const deliveryFeeInCents = this.appConfig.deliveryFeeInCents;
-    const totalInCents = subtotal + baseFeeInCents + deliveryFeeInCents;
+    const taxableInCents = subtotal + baseFeeInCents + deliveryFeeInCents;
 
-    // VAT is included in prices: break it out of the total (never on top),
-    // freezing the applied rate on the order.
-    return Money.create(totalInCents, ctx.product.currency).flatMap((money) =>
-      this.taxService
-        .breakdownIncludedTax(money.amountInCents, this.appConfig.taxRatePercent)
-        .map((tax) => ({
+    // Prices are the taxable base: VAT is ADDED on top of the charged
+    // amount, freezing the applied rate on the order.
+    return this.taxService
+      .taxOnBase(taxableInCents, this.appConfig.taxRatePercent)
+      .flatMap((tax) =>
+        Money.create(tax.totalInCents, ctx.product.currency).map((money) => ({
           ...ctx,
           money,
           baseFeeInCents,
@@ -218,7 +218,7 @@ export class CreateOrderUseCase {
           taxRatePercent: tax.ratePercent,
           taxInCents: tax.taxInCents,
         })),
-    );
+      );
   }
 
   private resolvePaymentMethod(

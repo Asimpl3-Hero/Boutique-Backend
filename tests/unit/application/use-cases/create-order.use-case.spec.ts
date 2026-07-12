@@ -111,18 +111,18 @@ describe('CreateOrderUseCase', () => {
     expect(mocks.pollingService.start).toHaveBeenCalledWith(order.id, 'prov_tx_1');
   });
 
-  it('persists the VAT breakdown included in the total (rate frozen per order)', async () => {
+  it('persists the VAT added on top of the base (rate frozen per order)', async () => {
     const mocks = buildUseCase();
     primeHappyPath(mocks);
 
     await mocks.useCase.execute(validInput());
 
-    // 129900 → taxable 110085 + tax 19815 at 18%; the total is untouched.
+    // Base 129900 → tax 23382 at 18% → 153282 charged.
     expect(mocks.orderRepository.createPending).toHaveBeenCalledWith(
       expect.objectContaining({
         taxRatePercent: 18,
-        taxInCents: 19815,
-        amountInCents: 129900,
+        taxInCents: 23382,
+        amountInCents: 153282,
       }),
     );
   });

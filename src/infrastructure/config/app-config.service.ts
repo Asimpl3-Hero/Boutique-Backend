@@ -45,7 +45,7 @@ export class AppConfigService {
     return this.intOrDefault('DELIVERY_FEE_IN_CENTS', 0);
   }
 
-  /** VAT rate included in product prices (integer percent, e.g. 18). */
+  /** VAT rate applied on top of product prices (integer percent, e.g. 18). */
   public get taxRatePercent(): number {
     return this.intOrDefault('TAX_RATE_PERCENT', 0);
   }

@@ -1,5 +1,8 @@
+import { join } from 'node:path';
+import { cwd } from 'node:process';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { ServeStaticModule } from '@nestjs/serve-static';
 import { AppConfigService } from './infrastructure/config/app-config.service';
 import { PrismaService } from './infrastructure/adapters/outbound/persistence/prisma.service';
 import { PrismaProductRepositoryAdapter } from './infrastructure/adapters/outbound/persistence/prisma-product.repository.adapter';
@@ -36,6 +39,12 @@ import { HealthController } from './infrastructure/adapters/inbound/http/health.
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
+    }),
+    // Product photos and other public assets under /static/*.
+    // cwd() (repo root / container WORKDIR) is stable across dev and dist.
+    ServeStaticModule.forRoot({
+      rootPath: join(cwd(), 'public'),
+      serveRoot: '/static',
     }),
   ],
   controllers: [ProductsController, OrdersController, HealthController],

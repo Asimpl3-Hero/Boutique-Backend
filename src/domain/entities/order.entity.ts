@@ -21,7 +21,7 @@ export interface Order {
   deliveryFeeInCents: number;
   /** VAT rate applied at creation time (integer percent, frozen per order). */
   taxRatePercent: number;
-  /** VAT portion included in amountInCents (never added on top). */
+  /** VAT added on top of the base; amountInCents already includes it. */
   taxInCents: number;
   amountInCents: number;
   currency: string;

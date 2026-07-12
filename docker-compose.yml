@@ -38,6 +38,7 @@ services:
       PAYMENTS_ACCEPTANCE_TOKEN: ${PAYMENTS_ACCEPTANCE_TOKEN:-}
       BASE_FEE_IN_CENTS: ${BASE_FEE_IN_CENTS:-0}
       DELIVERY_FEE_IN_CENTS: ${DELIVERY_FEE_IN_CENTS:-0}
+      TAX_RATE_PERCENT: ${TAX_RATE_PERCENT:-0}
       CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:5173}
       RATE_LIMIT_WINDOW_MS: ${RATE_LIMIT_WINDOW_MS:-60000}
       RATE_LIMIT_MAX_REQUESTS: ${RATE_LIMIT_MAX_REQUESTS:-120}
@@ -45,6 +46,9 @@ services:
       SWAGGER_PATH: ${SWAGGER_PATH:-docs}
     ports:
       - '${API_HOST_PORT:-3000}:${PORT:-3000}'
+    volumes:
+      # Live product photos: drop files in public/ without rebuilding.
+      - ./public:/app/public:ro
 
   seed:
     build:

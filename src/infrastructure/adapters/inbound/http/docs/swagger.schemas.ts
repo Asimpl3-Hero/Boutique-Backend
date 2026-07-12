@@ -60,7 +60,7 @@ export const PRODUCT_RESPONSE_SCHEMA = {
     taxRatePercent: {
       type: 'integer',
       example: 18,
-      description: 'VAT rate already included in priceInCents.',
+      description: 'VAT rate applied on top of priceInCents.',
     },
     createdAt: { type: 'string', format: 'date-time' },
   },
@@ -150,7 +150,7 @@ export const ORDER_RESPONSE_SCHEMA = {
     taxInCents: {
       type: 'integer',
       example: 1981525,
-      description: 'VAT portion included in amountInCents.',
+      description: 'VAT added on top of the base; amountInCents = base + tax.',
     },
     amountInCents: { type: 'integer', example: 12990000 },
     currency: { type: 'string', example: 'COP' },

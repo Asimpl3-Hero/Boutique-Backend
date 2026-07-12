@@ -106,7 +106,7 @@ describe('Order flow (integration)', () => {
     expect(stored.status).toBe('PENDING');
   });
 
-  it('computes the amount as price*qty plus fees', async () => {
+  it('computes the amount as price*qty plus fees plus VAT on top', async () => {
     const product = makeProduct({ stock: 5, priceInCents: 1000, currency: 'COP' });
     const flow = buildFlow([product]);
 
@@ -118,8 +118,11 @@ describe('Order flow (integration)', () => {
       await flow.getOrderByIdUseCase.execute(created.orderId)
     ).match((o) => o, () => null);
 
-    // 1000 * 2 + baseFee 500000 + deliveryFee 500000
-    expect(stored?.amountInCents).toBe(1_002_000);
+    // Base: 1000 * 2 + baseFee 500000 + deliveryFee 500000 = 1_002_000;
+    // VAT on top at 18%: 180_360 → 1_182_360 charged.
+    expect(stored?.taxRatePercent).toBe(18);
+    expect(stored?.taxInCents).toBe(180_360);
+    expect(stored?.amountInCents).toBe(1_182_360);
   });
 
   it('returns PRODUCT_NOT_FOUND when the product does not exist', async () => {

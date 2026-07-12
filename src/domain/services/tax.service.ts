@@ -2,28 +2,29 @@ import { AppError } from '../../shared/errors';
 import { Result, err, ok } from '../../shared/railway';
 
 export interface TaxBreakdown {
-  /** Taxable base (total minus the included tax). */
+  /** Taxable base the rate was applied to (pre-tax amount). */
   taxableInCents: number;
-  /** Tax portion included in the total. */
+  /** Tax added ON TOP of the base. */
   taxInCents: number;
+  /** Base + tax: the amount actually charged. */
+  totalInCents: number;
   /** Rate applied, as an integer percentage (e.g. 18). */
   ratePercent: number;
 }
 
 /**
- * VAT-included pricing: product prices are final, so the charged amount
- * never changes — the tax is broken OUT of the total, never added on top.
- * taxable = round(total × 100 / (100 + rate)); tax = total − taxable.
+ * VAT-on-top pricing: product prices are the taxable base, so the tax is
+ * ADDED to the total charged. tax = round(base × rate / 100).
  */
 export class TaxService {
-  public breakdownIncludedTax(
-    totalInCents: number,
+  public taxOnBase(
+    baseInCents: number,
     ratePercent: number,
   ): Result<TaxBreakdown, AppError> {
-    if (!Number.isInteger(totalInCents) || totalInCents <= 0) {
+    if (!Number.isInteger(baseInCents) || baseInCents <= 0) {
       return err({
         code: 'VALIDATION_ERROR',
-        message: 'totalInCents must be a positive integer.',
+        message: 'baseInCents must be a positive integer.',
       });
     }
 
@@ -38,13 +39,12 @@ export class TaxService {
       });
     }
 
-    const taxableInCents = Math.round(
-      (totalInCents * 100) / (100 + ratePercent),
-    );
+    const taxInCents = Math.round((baseInCents * ratePercent) / 100);
 
     return ok({
-      taxableInCents,
-      taxInCents: totalInCents - taxableInCents,
+      taxableInCents: baseInCents,
+      taxInCents,
+      totalInCents: baseInCents + taxInCents,
       ratePercent,
     });
   }
