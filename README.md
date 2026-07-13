@@ -1,4 +1,4 @@
-# Boutique — Backend 🧾
+# Borcelle — Backend
 
 API de <span style="color:#4F6BD8"><b>checkout y pagos</b></span> para **BORCELLE**, la boutique de ropa. Construida con **NestJS + TypeScript** en <span style="color:#4F6BD8"><b>arquitectura hexagonal</b></span> (ports & adapters), errores por **Result** (railway), **Prisma 7** sobre **PostgreSQL** y una pasarela de pago *sandbox* resuelta por <span style="color:#4F6BD8"><b>polling</b></span> — nunca webhooks.
 
@@ -9,6 +9,10 @@ API de <span style="color:#4F6BD8"><b>checkout y pagos</b></span> para **BORCELL
 ![Docker](https://img.shields.io/badge/Docker-compose-2496ED?logo=docker&logoColor=white)
 ![Swagger](https://img.shields.io/badge/Swagger-OpenAPI%203-85EA2D?logo=swagger&logoColor=black)
 ![Jest](https://img.shields.io/badge/Jest-159%20tests%20%C2%B7%20%3E80%25%20cov-C21325?logo=jest&logoColor=white)
+
+> **API en vivo:** [`borcelle-api.ondeploy.store`](https://borcelle-api.ondeploy.store/health) · **Swagger:** [`/docs`](https://borcelle-api.ondeploy.store/docs)
+
+![Swagger — portada de Borcelle API](public/swagger/Swagger.png)
 
 ## ⚡ Flujo de la app (simplificado)
 
@@ -42,15 +46,15 @@ sequenceDiagram
 
 ## ✨ Features
 
-- 🛍️ **Catálogo** — productos con precio base en centavos, stock, moneda y la <span style="color:#4F6BD8"><b>tasa de IVA</b></span> vigente; fotos servidas por la propia API bajo `/static`.
-- 💳 **Pagos tokenizados** — integración sandbox con *acceptance token* y firma de integridad SHA-256; solo viaja el token de la tarjeta.
-- 🧮 **IVA sobre la base** — `TAX_RATE_PERCENT` configurable; el desglose (tasa + centavos) se **congela por orden**, inmune a cambios futuros.
-- 🔄 **Polling resiliente** — backoff exponencial con tope 15s, timeout 60s y rehidratación de órdenes `PENDING` al arrancar.
-- 📦 **Stock atómico** — aprobación y descuento en una única transacción Prisma con guarda anti-sobreventa e idempotencia.
-- 🚚 **Delivery** — cada orden persiste su snapshot de envío completo.
-- 🛡️ **Hardening** — Helmet, CORS por lista, rate limiting y validación estricta (`whitelist` + `forbidNonWhitelisted`).
-- 📖 **Swagger en español** — palabras clave resaltadas y ejemplos realistas por endpoint y por código de error: [`/docs`](http://localhost:3000/docs).
-- 🚨 **Errores railway** — `Result<T, AppError>` en el núcleo (sin `throw`); códigos tipados mapeados a HTTP en el borde (`400/404/409/502/500`).
+- <span style="color:#4F6BD8"><b>Catálogo</b></span> — productos con precio base en centavos, stock, moneda y la <span style="color:#4F6BD8"><b>tasa de IVA</b></span> vigente; fotos servidas por la propia API bajo `/static`.
+- <span style="color:#4F6BD8"><b>Pagos tokenizados</b></span> — integración sandbox con *acceptance token* y firma de integridad SHA-256; solo viaja el token de la tarjeta.
+- <span style="color:#4F6BD8"><b>IVA sobre la base</b></span> — `TAX_RATE_PERCENT` configurable; el desglose (tasa + centavos) se **congela por orden**, inmune a cambios futuros.
+- <span style="color:#4F6BD8"><b>Polling resiliente</b></span> — backoff exponencial con tope 15s, timeout 60s y rehidratación de órdenes `PENDING` al arrancar.
+- <span style="color:#4F6BD8"><b>Stock atómico</b></span> — aprobación y descuento en una única transacción Prisma con guarda anti-sobreventa e idempotencia.
+- <span style="color:#4F6BD8"><b>Delivery</b></span> — cada orden persiste su snapshot de envío completo.
+- <span style="color:#4F6BD8"><b>Hardening</b></span> — Helmet, CORS por lista, rate limiting y validación estricta (`whitelist` + `forbidNonWhitelisted`).
+- <span style="color:#4F6BD8"><b>Swagger en español</b></span> — palabras clave resaltadas y ejemplos realistas por endpoint y por código de error: [`/docs`](https://borcelle-api.ondeploy.store/docs).
+- <span style="color:#4F6BD8"><b>Errores railway</b></span> — `Result<T, AppError>` en el núcleo (sin `throw`); códigos tipados mapeados a HTTP en el borde (`400/404/409/502/500`).
 
 ## 🏗️ Arquitectura
 
@@ -82,7 +86,7 @@ src/
 | `GET` | `/orders/:id` | Estado + desglose de la orden (endpoint de polling de la app) |
 | `GET` | `/static/*` | Fotos del catálogo |
 
-**Swagger UI:** `http://localhost:3000/docs` · **OpenAPI JSON:** `/docs-json`
+**Swagger UI:** [`https://borcelle-api.ondeploy.store/docs`](https://borcelle-api.ondeploy.store/docs) (producción) · `http://localhost:3000/docs` (local) · **OpenAPI JSON:** `/docs-json`
 
 ## 🔧 Variables de entorno
 
@@ -156,4 +160,4 @@ pnpm lint           # eslint --fix
 
 ---
 
-📱 El cliente de esta API vive en [`Boutique-Mobile`](../Boutique-Mobile/README.md) — app React Native con el checkout completo, facturas cifradas y el catálogo BORCELLE.
+El cliente de esta API vive en [`Boutique-Mobile`](../Boutique-Mobile/README.md) — app React Native con el checkout completo, facturas cifradas y el catálogo BORCELLE.

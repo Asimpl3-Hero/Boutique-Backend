@@ -70,7 +70,7 @@ function setupSwagger(
   );
 
   const documentConfig = new DocumentBuilder()
-    .setTitle('Boutique API')
+    .setTitle('BORCELLE API')
     .setDescription(
       [
         'Backend del checkout de ropa <span style="color:#4F6BD8;font-weight:bold">BORCELLE</span>: catálogo de productos, creación de órdenes con pago con tarjeta y consulta de su estado.',
@@ -106,7 +106,11 @@ function setupSwagger(
   });
 
   SwaggerModule.setup(swaggerPath, app, document, {
-    customSiteTitle: 'Boutique API Docs',
+    customSiteTitle: 'BORCELLE API Docs',
+    // Hides the "Servers" selector: the single relative server ('/') makes
+    // the dropdown pure noise. The bar also hosts the Authorize button —
+    // restore visibility if an auth scheme is ever added.
+    customCss: '.swagger-ui .scheme-container { display: none }',
     swaggerOptions: {
       persistAuthorization: true,
       tagsSorter: 'alpha',
